@@ -1,15 +1,18 @@
 <template>
-  <div class="d-flex justify-content-center aligns-item-center flex-column">
-        <span class="text-primary" v-for="done_line, done_index in done.slice(0, done.length-1)" :key="`done_line_${done_index}`">
-            {{ done_line }}
-        </span>
-        <span>
-            <span class="text-primary">{{ done[done.length - 1] }}</span> <b class="blink">></b> {{ pending[0] }}
-        </span>
-        <span class="text-muted" v-for="pending_line, pending_index in pending.slice(1, pending.length)" :key="`pending_line_${pending_index}`">
-            {{ pending_line }}
-        </span>
-  </div>
+    <div class="mx-auto container d-flex justify-content-center align-items-center mb-5">
+        <div class="text-justify d-flex justify-content-center aligns-item-center flex-column">
+            <span class="text-primary" v-for="doneLine, doneInedx in donePrimary" :key="`doneLine_${doneInedx}`">
+                {{ doneLine }}
+            </span>
+            <span>
+                <span class="text-primary">{{ doneCurrent }}</span><b class="blink"><i class="fas fa-i-cursor"></i></b>{{ pendingCurrent }}
+            </span>
+            <span class="text-muted" v-for="pendingLine, pendingIndex in pendingMuted" :key="`pendingLine_${pendingIndex}`">
+                {{ pendingLine }}
+            </span>
+        </div>
+    </div>
+    <small class="text-muted mt-5 text-justify"><i>Pressione <b>ESC</b> para voltar</i></small>
 </template>
 
 <script>
@@ -18,6 +21,20 @@ export default {
   props: {
       done: { type: Array },
       pending: { type: Array }
+  },
+  computed: {
+      donePrimary: function() {
+        return this.done.slice(0, this.done.length-1);
+      },
+      doneCurrent: function() {
+        return this.done[this.done.length - 1];
+      },
+      pendingCurrent: function() {
+        return this.pending[0];
+      },
+      pendingMuted: function() {
+        return this.pending.slice(1,this.pending.length);
+      }
   }
 }
 </script>
