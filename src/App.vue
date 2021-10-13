@@ -1,15 +1,24 @@
 <template>
 
-  <div class="progressWrapper bg-light bg-gradient text-primary d-flex justify-content-start align-items-center">
-    <div class="progress bg-primary bg-gradient" :style="`width:${progress}%`"></div>
+
+  <div class="bg-primary bg-gradient text-light"
+    :style="`transition: all 500ms ease-in-out; overflow:hidden; height:0px; padding-top:${status=='SOLVED'?'3rem':'0rem'}; padding-bottom:${status=='SOLVED'?'15rem':'0rem'}  `">
+    <h2 class="fw-bold">Peoma concluído!</h2>
+    <h6>Você digitou um total de <b>{{text.corrects + text.wrongs}} caracteres!</b></h6>
+    <h6>Dos quais, foram <b>{{text.corrects}} corretos</b> e <b>{{text.wrongs}} incorretos!</b></h6>
+    <button class="btn btn-outline-light mt-5" v-on:click="stopText">
+      <i class="fa fa-arrow-left me-2"></i> Voltar ao menu inicial
+    </button>
+  </div>
+  <div class=" bg-light  text-primary d-flex justify-content-start align-items-stretch mb-5" v-if="status=='SOLVING' || status=='SOLVED'">
+    <div class=" bg-primary" :style="`width:${progress}%`"></div>
     <span class="bg-white d-flex justify-content-center align-items-center w-10">{{`${doneTotal} / ${(pendingTotal+doneTotal)}`}}</span>
   </div>
-  <input type="text" ref="hiddenInput" onkeydown="this.value=''">
 
-  <TypingBox :done="text.done" :pending="text.pending" v-if="status=='SOLVING'"/>
-  <div class="mx-5 row g-3" v-else>
-    <div class="col" v-for="poem, poemIndex in poems" :key="`poem_${poemIndex}`">
-      <div class="card-body shadow">
+  <TypingBox :capslock="text.capsLock" :done="text.done" :pending="text.pending" v-if="status=='SOLVING' || status=='SOLVED'" class="mt-5"/>
+  <div class="mx-5 row g-3 mt-5" v-else>
+    <div class="col-4" v-for="poem, poemIndex in poems" :key="`poem_${poemIndex}`">
+      <div class="card-body shadow border">
         <small class="text-muted">
           <i class="fas fa-book"></i> Poema, {{poem.reduce((acc,line)=>(acc+line.length),0)}} letras
         </small>
@@ -26,6 +35,10 @@
     <div class="col card shadow">
       <div class="card-body row -sm mb-2" data-bs-toggle="collapse" data-bs-target="#collapse_info">
         <div class="col d-flex justify-content-center align-items-center flex-column">
+          <h3 class="text-muted mb-1">Configurações</h3>
+          <small class="text-muted">Clique para abrir/fechar</small>
+        </div>
+        <!-- <div class="col d-flex justify-content-center align-items-center flex-column">
           <h3 class="text-success mb-1">{{text.corrects}}</h3>
           <small class="text-muted">Acertos</small>
         </div>
@@ -36,10 +49,10 @@
         <div class="col d-flex justify-content-center align-items-center flex-column">
           <h3 class="text-primary mb-1">{{((text.corrects/(text.wrongs+text.corrects))*100).toFixed(2) || '-'}}<small>%</small></h3>
           <small class="text-muted">Precisão</small>
-        </div>
+        </div> -->
       </div>
 
-      <div class="row collapse show" id="collapse_info" style="overflow-y: auto; max-height:300px;">
+      <div class="row collapse" id="collapse_info" style="overflow-y: auto; max-height:300px;">
         <div class="col my-2">
           <div class="form-check form-switch">
             <input class="form-check-input" type="checkbox" id="checkAutoEnter" v-model="autoEnter">
@@ -96,7 +109,8 @@ export default {
         pending:      [''],
         pendingChars: 0,
         wrongs:       0,
-        corrects:     0
+        corrects:     0,
+        capsLock:     false
     },
     metrics: {},
     ignoreKeys: [ 'CapsLock', 'Shift', 'Control', 'Backspace' ]
@@ -125,7 +139,9 @@ export default {
       this.text.done = [''];
       this.text.doneChars = 0;
       this.text.pending = [''];
-      this.text.pendingChars = [''];
+      this.text.pendingChars = 0;
+      this.text.corrects = 0;
+      this.text.wrongs = 0;
     },
     updateMetrics(key, correct) {
       if(this.metrics[key.toUpperCase()]) {
@@ -139,35 +155,42 @@ export default {
     }
   },
   created: function() {
-    document.addEventListener('click', () => {
-      this.$refs.hiddenInput.focus();
-    });
-
     document.addEventListener('keydown', (event) => {
       let key = event.key;
+      console.log(key);
       if(key == 'Escape') { this.stopText(); }
+      if(key == 'CapsLock') { this.text.capsLock = !this.text.capsLock }
     });
     
     document.addEventListener('keypress', (event) => {
+      // Getting input key - return if is in ignore list
       let key = event.key;
       if(this.ignoreKeys.includes(key) || this.status != 'SOLVING') { return; }
 
+      // Getting current line, if is empty the text is over
       let currentLine = this.text.pending[0];
-      if((this.text.pending.length == 1 && currentLine.length == 0)) { return this.stopText(); }
+      if((this.text.pending.length == 1 && currentLine.length == 0)) { return this.status = 'SOLVED'; }
 
+      // Getting current letter, if is none is a breakline (Enter)
       let correct = currentLine.length > 0 ? currentLine[0] : 'Enter';
 
-      this.updateMetrics(key, correct);
+      console.log(correct);
+      console.log(key);
 
+      // If autoCaps is enabled, set both key and correct to uperCase
       if(this.autoCaps){
         key = key.toUpperCase();
         correct = correct.toUpperCase();
       }
 
+      // If autoAccent is enabled, remove accets from key and correct
       if(this.autoAccent) {
         key = key.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         correct = correct.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
       }
+
+      // Update metrics
+      this.updateMetrics(key, correct);
       
       if(key == correct) {
         this.text.done[this.text.done.length - 1] += (correct != 'Enter' ? correct : '');
@@ -202,11 +225,9 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
 </style>

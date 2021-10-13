@@ -5,14 +5,17 @@
                 {{ doneLine }}
             </span>
             <span>
-                <span class="text-primary">{{ doneCurrent }}</span><b class="blink"><i class="fas fa-i-cursor"></i></b>{{ pendingCurrent }}
+                <span class="text-primary">{{ doneCurrent }}</span><small class="blink"><i class="fa fa-chevron-right text-muted"></i></small>{{ pendingCurrent }}
             </span>
             <span class="text-muted" v-for="pendingLine, pendingIndex in pendingMuted" :key="`pendingLine_${pendingIndex}`">
                 {{ pendingLine }}
             </span>
         </div>
     </div>
+    <small v-if="capslock" class="text-muted mt-5 text-justify"><i class="fas fa-keyboard"></i>&nbsp;<i>Capslock está ativo</i></small>
+    <br>
     <small class="text-muted mt-5 text-justify"><i>Pressione <b>ESC</b> para voltar</i></small>
+    
 </template>
 
 <script>
@@ -20,7 +23,8 @@ export default {
   name: 'TypingBox',
   props: {
       done: { type: Array },
-      pending: { type: Array }
+      pending: { type: Array },
+      capslock: { type: Boolean }
   },
   computed: {
       donePrimary: function() {
@@ -45,7 +49,7 @@ export default {
     }
     @keyframes blink {
         0%{
-            opacity: 1;
+            opacity: 0.7;
         }
         100%{
             opacity: 0.5;
