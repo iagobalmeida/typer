@@ -6,6 +6,7 @@
     <h2 class="fw-bold">Peoma concluído!</h2>
     <h6>Você digitou um total de <b>{{text.corrects + text.wrongs}} caracteres!</b></h6>
     <h6>Dos quais, foram <b>{{text.corrects}} corretos</b> e <b>{{text.wrongs}} incorretos!</b></h6>
+    <h6>No total, você levou <b>{{timeSpentTreated}}</b> segundos para digitar!</h6>
     <button class="btn btn-outline-light mt-5" v-on:click="stopText">
       <i class="fa fa-arrow-left me-2"></i> Voltar ao menu inicial
     </button>
@@ -15,20 +16,31 @@
     <span class="bg-white d-flex justify-content-center align-items-center w-10">{{`${doneTotal} / ${(pendingTotal+doneTotal)}`}}</span>
   </div>
 
+  <div class="mx-5 row g-3 mt-5 mb-3 " v-else>
+    <div class="col-12">
+      <input class="form-control border shadow" type="text" v-model="search" placeholder="Pesquisar...">
+    </div>
+  </div>
+
   <TypingBox :capslock="text.capsLock" :done="text.done" :pending="text.pending" v-if="status=='SOLVING' || status=='SOLVED'" class="mt-5"/>
-  <div class="mx-5 row g-3 mt-5" v-else>
-    <div class="col-4" v-for="poem, poemIndex in poems" :key="`poem_${poemIndex}`">
+  
+  
+  <div class="mx-5 row g-3 mb-5" v-else data-masonry='{"percentPosition": true }'>
+    <div class="col-sm-6 col-lg-4" v-for="poem, poemIndex in filteredPoems" :key="`poem_${poemIndex}`">
       <div class="card-body shadow border">
         <small class="text-muted">
-          <i class="fas fa-book"></i> Poema, {{poem.reduce((acc,line)=>(acc+line.length),0)}} letras
+          <i class="fas fa-feather-alt"></i> {{poem.author}}, {{poem.text.reduce((acc,line)=>(acc+line.length),0)}} letras
         </small>
-        <h5 class="text-primary text-justify">{{poem.reduce((acc, line)=>(acc+(acc.length?'. ':'')+line),'').substring(0,160)}}...</h5>
-        <button class="btn btn-light w-100" v-on:click="startText(poemIndex)">
-          <i class="fas fa-feather-alt me-2"></i> Escrever
+        <h5 class="text-primary text-justify">{{poem.text.reduce((acc, line)=>(acc+(acc.length?'. ':'')+line),'').substring(0,160)}}...</h5>
+        <button class="btn btn-outline-primary w-100" v-on:click="startText(poemIndex)">
+          <i class="fas fa-book me-2"></i> Escrever
         </button>
       </div>
     </div>
   </div>
+
+  <br>
+  <small class="text-muted mt-5 text-justify" v-if="status == 'SOLVING'">{{timeSpentTreated}}</small>
 
 
   <div class="mx-5 row counter">
@@ -103,7 +115,10 @@ export default {
     autoAccent: false,
     autoCaps:  false,
     autoEnter:  false,
+    search:     '',
     text: {
+        timeInt:      null,
+        timeSpent:    null,
         done:         [''],
         doneChars:    0,
         pending:      [''],
@@ -116,6 +131,9 @@ export default {
     ignoreKeys: [ 'CapsLock', 'Shift', 'Control', 'Backspace' ]
   }),
   computed: {
+    filteredPoems: function () {
+      return this.poems.filter((poem) => (poem.text.reduce((acc,text) => (acc+text.toLowerCase()), '').indexOf(this.search.toLowerCase()) >= 0));
+    },
     pendingTotal: function () {
       return this.text.pending.reduce((acc, line) => (acc + line.length), 0);
     },
@@ -127,11 +145,17 @@ export default {
       let done    = this.doneTotal;
       let total   = pending + done;
       return (done*90/total).toFixed(0);
+    },
+    timeSpentTreated: function() {
+      let seconds = Math.floor(this.text.timeSpent/1000);
+      let miliseconds = ((this.text.timeSpent-(seconds*1000))/10).toFixed(0);
+      return ((seconds < 10) ? '0' : '')+seconds + ':' + (miliseconds < 10 ? '0':'')+miliseconds;
     }
   },
   methods: {
     startText(textId) {
-      this.text.pending = Object.assign([], this.poems[textId]);
+      let poem = this.filteredPoems[textId].text;
+      this.text.pending = Object.assign([], poem);
       this.status = 'SOLVING';
     },
     stopText() {
@@ -142,6 +166,18 @@ export default {
       this.text.pendingChars = 0;
       this.text.corrects = 0;
       this.text.wrongs = 0;
+    },
+    stopTimer() {
+      clearInterval(this.timeInt);
+      this.timeInt = null;
+    },
+    startTimer() {
+      let start = performance.now();
+      this.timeInt = setInterval(() => {
+        let now = performance.now();
+        this.text.timeSpent = now - start;
+        if(this.status != 'SOLVING') { this.stopTimer(); }
+      }, 100);
     },
     updateMetrics(key, correct) {
       if(this.metrics[key.toUpperCase()]) {
@@ -166,6 +202,7 @@ export default {
       // Getting input key - return if is in ignore list
       let key = event.key;
       if(this.ignoreKeys.includes(key) || this.status != 'SOLVING') { return; }
+
 
       // Getting current line, if is empty the text is over
       let currentLine = this.text.pending[0];
@@ -200,6 +237,9 @@ export default {
           this.text.pending.shift();
           this.text.done.push('');
         }
+        if(this.text.done[0].length == 1) {
+          this.startTimer();
+        }
         if(this.autoEnter) {
           let nextLine = this.text.pending[0];
           let nextCorrect = nextLine.length > 0 ? nextLine[0] : 'Enter';
@@ -211,7 +251,7 @@ export default {
             nextLine = this.text.pending[0];
             console.log(nextLine);
             console.log(Object.keys(this.text.pending).length);
-            if(!nextLine && Object.keys(this.text.pending).length == 0) { return this.stopText(); }
+            if(!nextLine && Object.keys(this.text.pending).length == 0) { return this.status = "SOLVED"; }
             nextCorrect = nextLine.length > 0 ? nextLine[0] : 'Enter';
           }
         }
@@ -229,5 +269,6 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  padding-bottom: 200px;
 }
 </style>

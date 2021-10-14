@@ -1,54 +1,73 @@
 {
     "poems": [
-        [
-            "O tempo é muito lento para os que esperam",
-            "Muito rápido para os que têm medo",
-            "Muito longo para os que lamentam",
-            "Muito curto para os que festejam",
-            "Mas, para os que amam, o tempo é eterno."
-        ],
-        [
-            "Que o breve",
-            "seja de um longo pensar",
-            "",
-            "Que o longo",
-            "seja de um curto sentir",
-            "",
-            "Que tudo seja leve",
-            "de tal forma",
-            "que o tempo nunca leve."
-        ],
-        [
-            "No meio do caminho tinha uma pedra",
-            "tinha uma pedra no meio do caminho",
-            "tinha uma pedra",
-            "no meio do caminho tinha uma pedra.",
-            "",
-            "Nunca me esquecerei desse acontecimento",
-            "na vida de minhas retinas tão fatigadas.",
-            "Nunca me esquecerei que no meio do caminho",
-            "tinha uma pedra",
-            "tinha uma pedra no meio do caminho",
-            "no meio do caminho tinha uma pedra."
-        ],
-        [
-            "De tudo, ao meu amor serei atento",
-            "Antes, e com tal zelo, e sempre, e tanto",
-            "Que mesmo em face do maior encanto",
-            "Dele se encante mais meu pensamento.",
-            "",
-            "Quero vivê-lo em cada vão momento",
-            "E em louvor hei de espalhar meu canto",
-            "E rir meu riso e derramar meu pranto",
-            "Ao seu pesar ou seu contentamento.",
-            "",
-            "E assim, quando mais tarde me procure",
-            "Quem sabe a morte, angústia de quem vive",
-            "Quem sabe a solidão, fim de quem ama",
-            "",
-            "Eu possa me dizer do amor (que tive):",
-            "Que não seja imortal, posto que é chama",
-            "Mas que seja infinito enquanto dure."
-        ]
+        {
+            "author": "Henry Van Dyke",
+            "text": [
+                "O tempo é muito lento para os que esperam",
+                "Muito rápido para os que têm medo",
+                "Muito longo para os que lamentam",
+                "Muito curto para os que festejam",
+                "Mas, para os que amam, o tempo é eterno."
+            ]
+        },
+        {
+            "author": "Mario Quintana",
+            "text": [
+                "Na mesma pedra se encontram,",
+                "Conforme o povo traduz,",
+                "Quando se nasce - uma estrela,",
+                "Quando se morre - uma cruz.",
+                "Mas quantos que aqui repousam",
+                "Hão de emendar-nos assim:",
+                "Ponham-me a cruz no princípio...",
+                "E a luz da estrela no fim!"
+            ]
+        },
+        {
+            "author": "Mario Quintana",
+            "text": [
+                "Quem sabe um dia",
+                "Quem sabe um seremos",
+                "Quem sabe um viveremos",
+                "Quem sabe um morreremos!",
+                "",
+                "Quem é que",
+                "Quem é macho",
+                "Quem é fêmea",
+                "Quem é humano, apenas!",
+                "",
+                "Sabe amar",
+                "Sabe de mim e de si",
+                "Sabe de nós",
+                "Sabe ser um!",
+                "",
+                "Um dia",
+                "Um mês",
+                "Um ano",
+                "Um(a) vida!"
+            ]
+        },
+        {
+            "author": "Mario Quintana",
+            "text": [
+                "Eu, agora - que desfecho!",
+                "Já nem penso mais em ti...",
+                "Mas será que nunca deixo",
+                "De lembrar que te esqueci?"
+            ]
+        },
+        {
+            "author": "Mario Quintana",
+            "text": [
+                "Se tu me amas, ama-me baixinho",
+                "Não o grites de cima dos telhados",
+                "Deixa em paz os passarinhos",
+                "Deixa em paz a mim!",
+                "Se me queres,",
+                "enfim,",
+                "tem de ser bem devagarinho, Amada,",
+                "que a vida é breve, e o amor mais breve ainda..."
+            ]
+        }
     ]
 }
