@@ -5,16 +5,16 @@
                 {{ doneLine }}
             </span>
             <span>
-                <span class="text-primary">{{ doneCurrent }}</span><small class="blink"><i class="fa fa-chevron-right text-muted"></i></small>{{ pendingCurrent }}
+                <span class="text-primary">{{ doneCurrent }}</span>
+                <span class="text-danger" v-if="lastWrong"> {{lastWrong}} </span>
+                <small class="blink"><i class="fa fa-chevron-right text-muted"></i>
+                </small>{{ pendingCurrent }}
             </span>
             <span class="text-muted" v-for="pendingLine, pendingIndex in pendingMuted" :key="`pendingLine_${pendingIndex}`">
                 {{ pendingLine }}
             </span>
         </div>
     </div>
-    <small v-if="capslock" class="text-muted mt-5 text-justify"><i class="fas fa-keyboard"></i>&nbsp;<i>Capslock está ativo</i></small>
-    <br>
-    <small class="text-muted mt-5 text-justify"><i>Pressione <b>ESC</b> para voltar</i></small>
     
 </template>
 
@@ -24,7 +24,7 @@ export default {
   props: {
       done: { type: Array },
       pending: { type: Array },
-      capslock: { type: Boolean }
+      lastWrong: { type: String }
   },
   computed: {
       donePrimary: function() {
